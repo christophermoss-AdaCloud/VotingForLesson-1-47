@@ -1,1 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Investor's Rubric - Voting Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for fallback icons and decorative elements -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f7f6f0;
+        }
+        h1, h2, h3, .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Blueprint grid background styled exactly like the draft background in the prompt */
+        .bg-blueprint {
+            background-color: #f7f6f0;
+            background-image: 
+                linear-gradient(rgba(139, 134, 115, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 134, 115, 0.08) 1px, transparent 1px),
+                linear-gradient(rgba(139, 134, 115, 0.03) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(139, 134, 115, 0.03) 2px, transparent 2px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: center center;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1ebd9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbc3a9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b5ac91;
+        }
+        /* Active coin anim */
+        .coin-bob {
+            animation: bobbing 3s ease-in-out infinite;
+        }
+        @keyframes bobbing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        /* Coin Slot Animations */
+        .coin-drop {
+            animation: coinDrop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes coinDrop {
+            0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-blueprint min-h-screen text-slate-800 antialiased flex flex-col pb-12">
+
+    <!-- Header Section -->
+    <header class="w-full border-b border-[#e4dec9] bg-[#fdfcf7]/80 backdrop-blur-md py-6 px-4 sticky top-0 z-40 transition-shadow">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-600">
+                    <i class="fa-solid fa-ranking-star text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">The Investor's Rubric</h1>
+                    <p class="text-sm text-slate-500">Official Student Voting & Assessment Suite</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openStatsModal()" class="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-sm transition-all shadow-sm">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    View Live Leaderboard
+                </button>
+                <button onclick="triggerReset()" class="p-2.5 border border-[#e4dec9] text-slate-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 rounded-xl transition-all" title="Reset All Ballot Data">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Main Container -->
+    <main class="max-w-7xl mx-auto w-full px-4 mt-8 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: The Interactive Rubric & Voting Terminal (8 Cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-8">
+            
+            <!-- The Rubric Display Card (Mimicking prompt visual) -->
+            <div class="bg-[#fdfcf7] border border-[#e4dec9] rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
+                <!-- Drafting Grid Overlay Graphic Accent -->
+                <div class="absolute right-0 top-0 w-32 h-32 opacity-10 pointer-events-none">
+                    <svg viewBox="0 0 100 100" class="w-full h-full stroke-slate-600 fill-none">
+                        <circle cx="100" cy="0" r="80" stroke-width="0.5"/>
+                        <circle cx="100" cy="0" r="50" stroke-width="0.5"/>
+                        <line x1="20" y1="0" x2="100" y2="80" stroke-width="0.5"/>
+                    </svg>
+                </div>
+
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2 heading-font">The Investor's Rubric</h2>
+                    <p class="text-slate-600 text-base">Allocate your three votes based strictly on these metrics. Each voter gets exactly one vote per metric category.</p>
+                </div>
+
+                <!-- Three Core Rubric Columns -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-[#e4dec9]/60">
+                    <!-- Clarity Metric Column -->
+                    <div class="flex flex-col items-center text-center p-4 rounded-xl hover:bg-emerald-500/[0.02] transition-colors group">
+                        <!-- Clarity Green Coin -->
+                        <div class="w-24 h-24 mb-4 relative drop-shadow-md group-hover:scale-105 transition-transform">
+                            <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <defs>
+                                    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#a7f3d0" />
+                                        <stop offset="100%" stop-color="#34d399" />
+                                    </linearGradient>
+                                    <linearGradient id="greenRim" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#059669" />
+                                        <stop offset="100%" stop-color="#064e3b" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="53" r="44" fill="url(#greenRim)"/>
+                                <circle cx="50" cy="49" r="44" fill="#10b981" stroke="#047857" stroke-width="1.5"/>
+                                <circle cx="50" cy="49" r="38" fill="url(#greenGrad)" opacity="0.9"/>
+                                <circle cx="50" cy="49" r="32" fill="none" stroke="#047857" stroke-width="1" stroke-dasharray="2 2"/>
+                                <!-- Crosshair Compass Icon -->
+                                <circle cx="50" cy="49" r="16" fill="none" stroke="#064e3b" stroke-width="2"/>
+                                <line x1="50" y1="27" x2="50" y2="71" stroke="#064e3b" stroke-width="2"/>
+                                <line x1="28" y1="49" x2="72" y2="49" stroke="#064e3b" stroke-width="2"/>
+                                <polygon points="50,41 53,49 50,57 47,49" fill="#047857"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Clarity</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Did they clearly define the exact purpose and user requirements?</p>
+                    </div>
+
+                    <!-- Detail Metric Column -->
+                    <div class="flex flex-col items-center text-center p-4 rounded-xl hover:bg-blue-500/[0.02] transition-colors group">
+                        <!-- Detail Blue Coin -->
+                        <div class="w-24 h-24 mb-4 relative drop-shadow-md group-hover:scale-105 transition-transform">
+                            <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <defs>
+                                    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#93c5fd" />
+                                        <stop offset="100%" stop-color="#60a5fa" />
+                                    </linearGradient>
+                                    <linearGradient id="blueRim" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#2563eb" />
+                                        <stop offset="100%" stop-color="#1e3a8a" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="53" r="44" fill="url(#blueRim)"/>
+                                <circle cx="50" cy="49" r="44" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                                <circle cx="50" cy="49" r="38" fill="url(#blueGrad)" opacity="0.9"/>
+                                <circle cx="50" cy="49" r="32" fill="none" stroke="#1d4ed8" stroke-width="1" stroke-dasharray="2 2"/>
+                                <!-- Flow/Gear Icon -->
+                                <g transform="translate(50, 49) scale(0.95)">
+                                    <circle cx="-6" cy="6" r="6" fill="none" stroke="#1e3a8a" stroke-width="2"/>
+                                    <circle cx="8" cy="-8" r="5" fill="none" stroke="#1e3a8a" stroke-width="2"/>
+                                    <path d="M -6,0 C -6,-6 2,-6 8,-3" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-dasharray="1 1"/>
+                                    <!-- Mini gears/dots -->
+                                    <circle cx="-6" cy="6" r="2" fill="#1e3a8a"/>
+                                    <circle cx="8" cy="-8" r="1.5" fill="#1e3a8a"/>
+                                    <line x1="-12" y1="-8" x2="0" y2="4" stroke="#1e3a8a" stroke-width="1.5"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Detail</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Is the proposed solution comprehensive, with clear test plans and alternatives?</p>
+                    </div>
+
+                    <!-- Innovation Metric Column -->
+                    <div class="flex flex-col items-center text-center p-4 rounded-xl hover:bg-amber-500/[0.02] transition-colors group">
+                        <!-- Innovation Gold Coin -->
+                        <div class="w-24 h-24 mb-4 relative drop-shadow-md group-hover:scale-105 transition-transform">
+                            <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <defs>
+                                    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#fef08a" />
+                                        <stop offset="100%" stop-color="#fbbf24" />
+                                    </linearGradient>
+                                    <linearGradient id="goldRim" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#d97706" />
+                                        <stop offset="100%" stop-color="#78350f" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="53" r="44" fill="url(#goldRim)"/>
+                                <circle cx="50" cy="49" r="44" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+                                <circle cx="50" cy="49" r="38" fill="url(#goldGrad)" opacity="0.9"/>
+                                <circle cx="50" cy="49" r="32" fill="none" stroke="#b45309" stroke-width="1" stroke-dasharray="2 2"/>
+                                <!-- Lightbulb Icon -->
+                                <path d="M 50,32 C 43,32 39,37 39,44 C 39,49 42,52 44,55 L 44,61 C 44,62 45,63 47,63 L 53,63 C 55,63 56,62 56,61 L 56,55 C 58,52 61,49 61,44 C 61,37 57,32 50,32 Z" fill="none" stroke="#78350f" stroke-width="2"/>
+                                <line x1="46" y1="67" x2="54" y2="67" stroke="#78350f" stroke-width="2"/>
+                                <line x1="48" y1="71" x2="52" y2="71" stroke="#78350f" stroke-width="2"/>
+                                <circle cx="50" cy="44" r="3" fill="#78350f"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Innovation</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Was the pitch inventive, engaging, and defensively sound?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toast Messages Panel (Custom Non-blocking Alerts) -->
+            <div id="toast-container" class="hidden flex items-center gap-3 p-4 rounded-xl border transition-all duration-300">
+                <div id="toast-icon" class="text-xl"></div>
+                <div id="toast-message" class="text-sm font-semibold"></div>
+            </div>
+
+            <!-- Dynamic Voting Interface Panel -->
+            <div class="bg-[#fdfcf7] border border-[#e4dec9] rounded-2xl p-6 md:p-8 shadow-sm">
+                <!-- Session/Auth Guard Frame -->
+                <div id="voter-auth-box">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2 heading-font">Voter Registration</h3>
+                    <p class="text-slate-500 text-sm mb-6">Enter your credentials to secure your digital ballot. Each student is allocated exactly one voting slip of three distinct category points.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Voter's Full Name</label>
+                            <input type="text" id="voter-name" placeholder="E.g. Sarah Jenkins" class="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e4dec9] rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none transition-all font-medium text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Student Identification Number</label>
+                            <input type="text" id="voter-id" placeholder="E.g. 250000" class="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e4dec9] rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none transition-all font-medium text-slate-800">
+                        </div>
+                    </div>
+
+                    <button onclick="registerVoter()" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-base">
+                        <i class="fa-solid fa-key"></i>
+                        Open Personal Ballot Paper
+                    </button>
+                </div>
+
+                <!-- Live Voting Slip (Visible post credentials submission) -->
+                <div id="ballot-paper" class="hidden">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#e4dec9] pb-6 mb-8 gap-4">
+                        <div>
+                            <span class="px-2.5 py-1 bg-amber-500/10 text-amber-700 text-xs font-bold rounded-full border border-amber-500/20 uppercase tracking-wide">Secure Session Active</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-1 heading-font" id="ballot-voter-label"></h3>
+                        </div>
+                        <button onclick="logoutVoter()" class="text-xs font-semibold text-slate-400 hover:text-red-500 flex items-center gap-1.5 px-3 py-1.5 hover:bg-red-50 rounded-lg transition-all">
+                            <i class="fa-solid fa-right-from-bracket"></i> Clear Credentials
+                        </button>
+                    </div>
+
+                    <!-- Category Slots Selection Guide -->
+                    <div class="mb-8">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Your Active Ballot Slip</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Slot 1: Clarity Vote Selection -->
+                            <div onclick="setActiveCategory('clarity')" id="slot-clarity" class="cursor-pointer p-4 border-2 border-dashed border-[#e4dec9] hover:border-emerald-400 bg-emerald-50/5 hover:bg-emerald-50/30 rounded-xl transition-all relative flex flex-col items-center justify-center text-center min-h-[140px]">
+                                <div id="badge-clarity" class="absolute top-2 right-2 hidden text-emerald-600"><i class="fa-solid fa-circle-check"></i></div>
+                                <div id="coin-slot-clarity" class="mb-2">
+                                    <i class="fa-solid fa-bullseye text-emerald-300 text-3xl"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-widest text-emerald-600">1. Clarity Vote</span>
+                                <span id="label-slot-clarity" class="text-sm font-semibold text-slate-400 mt-1">Empty Slot</span>
+                            </div>
+
+                            <!-- Slot 2: Detail Vote Selection -->
+                            <div onclick="setActiveCategory('detail')" id="slot-detail" class="cursor-pointer p-4 border-2 border-dashed border-[#e4dec9] hover:border-blue-400 bg-blue-50/5 hover:bg-blue-50/30 rounded-xl transition-all relative flex flex-col items-center justify-center text-center min-h-[140px]">
+                                <div id="badge-detail" class="absolute top-2 right-2 hidden text-blue-600"><i class="fa-solid fa-circle-check"></i></div>
+                                <div id="coin-slot-detail" class="mb-2">
+                                    <i class="fa-solid fa-diagram-project text-blue-300 text-3xl"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-widest text-blue-600">2. Detail Vote</span>
+                                <span id="label-slot-detail" class="text-sm font-semibold text-slate-400 mt-1">Empty Slot</span>
+                            </div>
+
+                            <!-- Slot 3: Innovation Vote Selection -->
+                            <div onclick="setActiveCategory('innovation')" id="slot-innovation" class="cursor-pointer p-4 border-2 border-dashed border-[#e4dec9] hover:border-amber-400 bg-amber-50/5 hover:bg-amber-50/30 rounded-xl transition-all relative flex flex-col items-center justify-center text-center min-h-[140px]">
+                                <div id="badge-innovation" class="absolute top-2 right-2 hidden text-amber-600"><i class="fa-solid fa-circle-check"></i></div>
+                                <div id="coin-slot-innovation" class="mb-2">
+                                    <i class="fa-regular fa-lightbulb text-amber-300 text-3xl"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-widest text-amber-600">3. Innovation Vote</span>
+                                <span id="label-slot-innovation" class="text-sm font-semibold text-slate-400 mt-1">Empty Slot</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search / Candidate List Segment -->
+                    <div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-900 heading-font">Assign Candidate Card</h4>
+                                <p class="text-xs text-slate-500 mt-0.5" id="assignment-instruction">Select a metric slot above, then click a candidate's name below to drop the coin.</p>
+                            </div>
+                            <div class="relative w-full sm:w-64">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                                </span>
+                                <input type="text" id="candidate-search" oninput="filterCandidates()" placeholder="Find candidate name..." class="w-full pl-9 pr-4 py-2 bg-[#f7f6f0] border border-[#e4dec9] rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm font-medium">
+                            </div>
+                        </div>
+
+                        <!-- Candidates Container Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-2" id="candidates-deck">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Submit Ballot Section -->
+                    <div class="mt-8 pt-6 border-t border-[#e4dec9] flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-sm text-slate-500 text-center sm:text-left">
+                            Please review your slot choices. All 3 votes must be assigned to submit.
+                        </div>
+                        <button onclick="submitBallot()" id="btn-submit-ballot" disabled class="w-full sm:w-auto px-8 py-3.5 bg-slate-300 text-slate-500 font-bold rounded-xl transition-all cursor-not-allowed flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Completed Slip
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Right Column: Live Data Feed, Quick Stats, & Simulation Deck (4 Cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Real-Time Stats Overview -->
+            <div class="bg-[#fdfcf7] border border-[#e4dec9] rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 heading-font flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-amber-500"></i>
+                    Voting Statistics
+                </h3>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-[#f7f6f0] p-4 rounded-xl border border-[#e4dec9]/60">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total Ballots</span>
+                        <span id="stat-ballots-count" class="text-3xl font-extrabold text-slate-900 heading-font">0</span>
+                    </div>
+                    <div class="bg-[#f7f6f0] p-4 rounded-xl border border-[#e4dec9]/60">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total Votes</span>
+                        <span id="stat-votes-count" class="text-3xl font-extrabold text-slate-900 heading-font">0</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-[#e4dec9]/60 flex flex-col gap-3">
+                    <div class="flex items-center justify-between text-xs text-slate-600 font-semibold">
+                        <span>Clarity Allocation</span>
+                        <span id="metric-clarity-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-[#f1ebd9] h-2 rounded-full overflow-hidden">
+                        <div id="metric-clarity-progress" class="bg-emerald-500 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-600 font-semibold mt-1">
+                        <span>Detail Allocation</span>
+                        <span id="metric-detail-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-[#f1ebd9] h-2 rounded-full overflow-hidden">
+                        <div id="metric-detail-progress" class="bg-blue-500 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-600 font-semibold mt-1">
+                        <span>Innovation Allocation</span>
+                        <span id="metric-innovation-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-[#f1ebd9] h-2 rounded-full overflow-hidden">
+                        <div id="metric-innovation-progress" class="bg-amber-500 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Deck (For rapid presentation/testing) -->
+            <div class="bg-[#fdfcf7] border border-[#e4dec9] rounded-2xl p-6 shadow-sm border-l-4 border-l-amber-500">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="p-1 bg-amber-500/10 text-amber-700 rounded text-xs font-bold">Sandbox Tools</span>
+                    <h3 class="text-md font-bold text-slate-900 heading-font">Classroom Simulator</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Want to see how the dashboard behaves? Simulate classroom behavior by instantly generating random ballots.</p>
+                
+                <div class="flex flex-col gap-2">
+                    <button onclick="simulateMultipleVotes(10)" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-user-group"></i> Simulate 10 Random Student Ballots
+                    </button>
+                    <button onclick="simulateMultipleVotes(50)" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-graduation-cap"></i> Simulate 50 Random Student Ballots
+                    </button>
+                    <button onclick="clearDatabase()" class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:border-red-300 font-bold rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Flush All Generated Records
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Ballots Audit Log -->
+            <div class="bg-[#fdfcf7] border border-[#e4dec9] rounded-2xl p-6 shadow-sm flex-grow">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 heading-font flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-slate-400"></i>
+                    Recent Ballots Cast
+                </h3>
+                <div id="recent-ballots-list" class="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1">
+                    <!-- Dynamic logs rendered here -->
+                    <div class="text-center py-6 text-slate-400 text-xs font-medium">No ballots logged in active sandbox session yet.</div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal: Live Statistics & Full Standings -->
+    <div id="stats-modal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-[#fdfcf7] border border-[#e4dec9] w-full max-w-4xl rounded-2xl shadow-xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-[#e4dec9] flex items-center justify-between bg-slate-900 text-white">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
+                    <h3 class="text-xl font-bold heading-font">Investor Leaderboard & Category Standing</h3>
+                </div>
+                <button onclick="closeStatsModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto flex-grow">
+                <!-- Main Category Podium Standings -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <!-- Metric Box: Clarity -->
+                    <div class="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Clarity Master
+                            </span>
+                            <h4 id="podium-clarity-name" class="text-base font-bold text-slate-900 mt-2 truncate">No Candidate Yet</h4>
+                        </div>
+                        <span id="podium-clarity-count" class="text-sm font-semibold text-emerald-600 mt-1">0 Votes</span>
+                    </div>
+
+                    <!-- Metric Box: Detail -->
+                    <div class="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Detail Guru
+                            </span>
+                            <h4 id="podium-detail-name" class="text-base font-bold text-slate-900 mt-2 truncate">No Candidate Yet</h4>
+                        </div>
+                        <span id="podium-detail-count" class="text-sm font-semibold text-blue-600 mt-1">0 Votes</span>
+                    </div>
+
+                    <!-- Metric Box: Innovation -->
+                    <div class="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Innovation Pioneer
+                            </span>
+                            <h4 id="podium-innovation-name" class="text-base font-bold text-slate-900 mt-2 truncate">No Candidate Yet</h4>
+                        </div>
+                        <span id="podium-innovation-count" class="text-sm font-semibold text-amber-600 mt-1">0 Votes</span>
+                    </div>
+                </div>
+
+                <!-- Grid Standings Table -->
+                <div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+                        <h4 class="text-lg font-bold text-slate-900 heading-font">General Standings</h4>
+                        <div class="flex items-center gap-2">
+                            <button onclick="sortStandings('total')" class="text-xs bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-[#e4dec9]">Sort by Total</button>
+                            <button onclick="sortStandings('name')" class="text-xs bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-[#e4dec9]">Sort by Name</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-[#e4dec9] bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 text-xs font-bold border-b border-[#e4dec9] uppercase tracking-wider">
+                                    <th class="py-3 px-4">Candidate</th>
+                                    <th class="py-3 px-4 text-center">Clarity</th>
+                                    <th class="py-3 px-4 text-center">Detail</th>
+                                    <th class="py-3 px-4 text-center">Innovation</th>
+                                    <th class="py-3 px-4 text-right">Aggregate Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standings-table-body" class="text-sm divide-y divide-[#e4dec9]/40">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-[#e4dec9] flex items-center justify-between bg-slate-50">
+                <span class="text-xs font-semibold text-slate-500">Aggregate numbers calculated from all verified cast slips.</span>
+                <button onclick="closeStatsModal()" class="px-5 py-2 bg-slate-950 text-white font-bold rounded-lg text-xs hover:bg-slate-800 transition-all">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-[#e4dec9] w-full max-w-md rounded-2xl p-6 shadow-xl text-center">
+            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 heading-font mb-2">Flush All Voting Data?</h3>
+            <p class="text-slate-500 text-sm mb-6">This operation will instantly wipe all student ballots, credential audits, and leaderboard points permanently. This cannot be undone.</p>
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="cancelReset()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-sm transition-all">Cancel</button>
+                <button onclick="executeReset()" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-sm transition-all shadow-md">Yes, Reset Standings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        // Array of 22 Candidates exact as prompt requested
+        const rawCandidates = [
+            "AbdiMudalib252596",
+            "AdamAsad252489",
+            "AhmedRory252594",
+            "Al-ShamariFahad242165",
+            "BizzozeroMathias Satya252481",
+            "DuncanJoshua252525",
+            "GayafUmut252478",
+            "GeorgievDimitar252539",
+            "GulerFurkan252491",
+            "HamoucheAhsen252505",
+            "HapieievMark252457",
+            "MbelengeJoovan252454",
+            "MemetGeaner252473",
+            "Nembhard NewellTaleah252468",
+            "NsumbuAdil252564",
+            "PodemskiRobert252587",
+            "QuinnellAdam252554",
+            "RahmanifarSaleh252575",
+            "Ramirez ReyesRichard252458",
+            "RidaZiad252581",
+            "SyedAayan Muhammad252578",
+            "VikrenthVidhula"
+        ];
+
+        // Format candidate names into presentation objects
+        const candidates = rawCandidates.map((raw, index) => {
+            // Find numbers at the end
+            const numMatch = raw.match(/\d+$/);
+            const idNumber = numMatch ? numMatch[0] : "";
+            let namePart = numMatch ? raw.substring(0, raw.length - idNumber.length) : raw;
+
+            // Introduce camelCase split for readable presentation names
+            // E.g., "AbdiMudalib" -> "Abdi Mudalib", "Al-ShamariFahad" -> "Al-Shamari Fahad"
+            let formattedName = namePart
+                .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
+                .replace(/^ /, '') // Trim starting space
+                .replace(/\s+/g, ' ') // Ensure single spacing
+                .trim();
+            
+            // Clean specific double-spaces/formatting exceptions
+            if (formattedName.startsWith("Al- Shamari")) {
+                formattedName = formattedName.replace("Al- Shamari", "Al-Shamari");
+            }
+            if (formattedName.startsWith("Ramirez Reyes")) {
+                formattedName = "Ramirez Reyes Richard";
+            }
+            if (formattedName.startsWith("Nembhard Newell")) {
+                formattedName = "Nembhard Newell Taleah";
+            }
+
+            return {
+                rawId: raw,
+                displayName: formattedName,
+                studentId: idNumber || "N/A",
+                index: index
+            };
+        });
+
+        // Application State
+        let dbState = {
+            voters: [], // List of { voterName, voterId, timestamp }
+            ballots: [], // List of { voterName, voterId, clarityVote: rawId, detailVote: rawId, innovationVote: rawId }
+        };
+
+        let currentSession = {
+            voterName: "",
+            voterId: "",
+            clarity: null,    // Selected candidate object
+            detail: null,     // Selected candidate object
+            innovation: null  // Selected candidate object
+        };
+
+        let activeCategorySelection = "clarity"; // Current focused voting slot
+
+        // Initialize state from LocalStorage on load
+        window.onload = function() {
+            const stored = localStorage.getItem("investor_rubric_data");
+            if (stored) {
+                try {
+                    dbState = JSON.parse(stored);
+                } catch(e) {
+                    console.error("Storage corrupt. Resetting.", e);
+                }
+            }
+            
+            renderCandidatesGrid();
+            updateAppDashboard();
+            setActiveCategory("clarity");
+        };
+
+        // Persist DB state to localstorage
+        function saveState() {
+            localStorage.setItem("investor_rubric_data", JSON.stringify(dbState));
+            updateAppDashboard();
+        }
+
+        // Render Candidates Grid view
+        function renderCandidatesGrid() {
+            const query = document.getElementById("candidate-search").value.toLowerCase();
+            const deck = document.getElementById("candidates-deck");
+            deck.innerHTML = "";
+
+            candidates.forEach(c => {
+                const searchStr = `${c.displayName} ${c.studentId}`.toLowerCase();
+                if (query && !searchStr.includes(query)) return;
+
+                // Check if candidate is already picked for clarity, detail, or innovation in the active slip
+                let isPickedHere = "";
+                let coinIndicator = "";
+                if (currentSession.clarity?.rawId === c.rawId) {
+                    isPickedHere = "border-emerald-500 bg-emerald-500/10";
+                    coinIndicator = `<span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200 mt-2 block w-max"><i class="fa-solid fa-circle"></i> Clarity Choice</span>`;
+                } else if (currentSession.detail?.rawId === c.rawId) {
+                    isPickedHere = "border-blue-500 bg-blue-500/10";
+                    coinIndicator = `<span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md border border-blue-200 mt-2 block w-max"><i class="fa-solid fa-circle"></i> Detail Choice</span>`;
+                } else if (currentSession.innovation?.rawId === c.rawId) {
+                    isPickedHere = "border-amber-500 bg-amber-500/10";
+                    coinIndicator = `<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200 mt-2 block w-max"><i class="fa-solid fa-circle"></i> Innovation Choice</span>`;
+                }
+
+                const card = document.createElement("div");
+                card.className = `p-4 border border-[#e4dec9] bg-white rounded-xl shadow-sm hover:shadow hover:border-slate-400 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between select-none ${isPickedHere}`;
+                card.onclick = () => selectCandidate(c);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm leading-tight">${c.displayName}</div>
+                        <div class="text-xs text-slate-400 mt-0.5">ID: ${c.studentId}</div>
+                    </div>
+                    ${coinIndicator}
+                `;
+                deck.appendChild(card);
+            });
+        }
+
+        function filterCandidates() {
+            renderCandidatesGrid();
+        }
+
+        // Set active category slot
+        function setActiveCategory(cat) {
+            activeCategorySelection = cat;
+            
+            // Remove active outlines from slots
+            document.getElementById("slot-clarity").className = document.getElementById("slot-clarity").className.replace(" border-emerald-500 shadow-inner", "").replace(" border-[#e4dec9]", "");
+            document.getElementById("slot-detail").className = document.getElementById("slot-detail").className.replace(" border-blue-500 shadow-inner", "").replace(" border-[#e4dec9]", "");
+            document.getElementById("slot-innovation").className = document.getElementById("slot-innovation").className.replace(" border-amber-500 shadow-inner", "").replace(" border-[#e4dec9]", "");
+
+            // Apply specific active borders and colors
+            if (cat === "clarity") {
+                document.getElementById("slot-clarity").className += " border-emerald-500 shadow-inner";
+                document.getElementById("assignment-instruction").innerText = "Assigning: Choose a student from the deck below for Clarity.";
+            } else if (cat === "detail") {
+                document.getElementById("slot-detail").className += " border-blue-500 shadow-inner";
+                document.getElementById("assignment-instruction").innerText = "Assigning: Choose a student from the deck below for Detail.";
+            } else if (cat === "innovation") {
+                document.getElementById("slot-innovation").className += " border-amber-500 shadow-inner";
+                document.getElementById("assignment-instruction").innerText = "Assigning: Choose a student from the deck below for Innovation.";
+            }
+
+            renderCandidatesGrid();
+        }
+
+        // Action when a candidate card is selected
+        function selectCandidate(candidate) {
+            // Prevent choosing the exact same candidate across different slots to enforce separate votes
+            if (activeCategorySelection === "clarity") {
+                if (currentSession.detail?.rawId === candidate.rawId || currentSession.innovation?.rawId === candidate.rawId) {
+                    showToast("Double-voting blocked! A candidate can only receive one metric vote per ballot.", "warning");
+                    return;
+                }
+                currentSession.clarity = candidate;
+                document.getElementById("label-slot-clarity").innerText = candidate.displayName;
+                document.getElementById("label-slot-clarity").className = "text-sm font-extrabold text-emerald-800 mt-1";
+                document.getElementById("badge-clarity").classList.remove("hidden");
+                // Animate drop
+                document.getElementById("coin-slot-clarity").className = "mb-2 coin-drop";
+                document.getElementById("coin-slot-clarity").innerHTML = `
+                    <svg viewBox="0 0 100 100" class="w-12 h-12">
+                        <circle cx="50" cy="53" r="44" fill="#064e3b"/>
+                        <circle cx="50" cy="49" r="44" fill="#10b981" stroke="#047857" stroke-width="1.5"/>
+                        <circle cx="50" cy="49" r="16" fill="none" stroke="#064e3b" stroke-width="2"/>
+                        <line x1="50" y1="27" x2="50" y2="71" stroke="#064e3b" stroke-width="2"/>
+                        <line x1="28" y1="49" x2="72" y2="49" stroke="#064e3b" stroke-width="2"/>
+                    </svg>
+                `;
+            } else if (activeCategorySelection === "detail") {
+                if (currentSession.clarity?.rawId === candidate.rawId || currentSession.innovation?.rawId === candidate.rawId) {
+                    showToast("Double-voting blocked! A candidate can only receive one metric vote per ballot.", "warning");
+                    return;
+                }
+                currentSession.detail = candidate;
+                document.getElementById("label-slot-detail").innerText = candidate.displayName;
+                document.getElementById("label-slot-detail").className = "text-sm font-extrabold text-blue-800 mt-1";
+                document.getElementById("badge-detail").classList.remove("hidden");
+                // Animate drop
+                document.getElementById("coin-slot-detail").className = "mb-2 coin-drop";
+                document.getElementById("coin-slot-detail").innerHTML = `
+                    <svg viewBox="0 0 100 100" class="w-12 h-12">
+                        <circle cx="50" cy="53" r="44" fill="#1e3a8a"/>
+                        <circle cx="50" cy="49" r="44" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                        <circle cx="50" cy="49" r="16" fill="none" stroke="#1e3a8a" stroke-width="2"/>
+                    </svg>
+                `;
+            } else if (activeCategorySelection === "innovation") {
+                if (currentSession.clarity?.rawId === candidate.rawId || currentSession.detail?.rawId === candidate.rawId) {
+                    showToast("Double-voting blocked! A candidate can only receive one metric vote per ballot.", "warning");
+                    return;
+                }
+                currentSession.innovation = candidate;
+                document.getElementById("label-slot-innovation").innerText = candidate.displayName;
+                document.getElementById("label-slot-innovation").className = "text-sm font-extrabold text-amber-800 mt-1";
+                document.getElementById("badge-innovation").classList.remove("hidden");
+                // Animate drop
+                document.getElementById("coin-slot-innovation").className = "mb-2 coin-drop";
+                document.getElementById("coin-slot-innovation").innerHTML = `
+                    <svg viewBox="0 0 100 100" class="w-12 h-12">
+                        <circle cx="50" cy="53" r="44" fill="#78350f"/>
+                        <circle cx="50" cy="49" r="44" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+                        <circle cx="50" cy="49" r="16" fill="none" stroke="#78350f" stroke-width="2"/>
+                    </svg>
+                `;
+            }
+
+            // Check if all slots filled to enable submission
+            validateFormState();
+            renderCandidatesGrid();
+        }
+
+        // Verify if active ballot slip is complete
+        function validateFormState() {
+            const submitBtn = document.getElementById("btn-submit-ballot");
+            if (currentSession.clarity && currentSession.detail && currentSession.innovation) {
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2";
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.className = "w-full sm:w-auto px-8 py-3.5 bg-slate-300 text-slate-500 font-bold rounded-xl transition-all cursor-not-allowed flex items-center justify-center gap-2";
+            }
+        }
+
+        // Register Credentials
+        function registerVoter() {
+            const name = document.getElementById("voter-name").value.trim();
+            const id = document.getElementById("voter-id").value.trim();
+
+            if (!name || !id) {
+                showToast("Please provide both Name and Student ID credentials.", "warning");
+                return;
+            }
+
+            // Enforce registration double check
+            const duplicate = dbState.ballots.find(b => b.voterId === id);
+            if (duplicate) {
+                showToast("This student identification number has already cast a ballot.", "danger");
+                return;
+            }
+
+            currentSession.voterName = name;
+            currentSession.voterId = id;
+
+            // Transition Frames
+            document.getElementById("voter-auth-box").classList.add("hidden");
+            document.getElementById("ballot-paper").classList.remove("hidden");
+            document.getElementById("ballot-voter-label").innerText = `Ballot Slip for: ${name} (ID: ${id})`;
+
+            showToast("Ballot slip initialized successfully. Place your category coins!", "success");
+        }
+
+        // Submit Ballot Paper
+        function submitBallot() {
+            if (!currentSession.clarity || !currentSession.detail || !currentSession.innovation) {
+                showToast("Incomplete ballot slip! All 3 metric categories must be assigned.", "warning");
+                return;
+            }
+
+            // Register new ballot record
+            const newBallot = {
+                voterName: currentSession.voterName,
+                voterId: currentSession.voterId,
+                clarityVote: currentSession.clarity.rawId,
+                detailVote: currentSession.detail.rawId,
+                innovationVote: currentSession.innovation.rawId,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            dbState.ballots.push(newBallot);
+            saveState();
+
+            showToast("Your official rubric ballot has been safely submitted and integrated!", "success");
+            logoutVoter();
+        }
+
+        // Exit active ballot paper sandbox
+        function logoutVoter() {
+            currentSession = {
+                voterName: "",
+                voterId: "",
+                clarity: null,
+                detail: null,
+                innovation: null
+            };
+
+            // Reset credentials input values
+            document.getElementById("voter-name").value = "";
+            document.getElementById("voter-id").value = "";
+
+            // Reset coin display items
+            document.getElementById("badge-clarity").classList.add("hidden");
+            document.getElementById("badge-detail").classList.add("hidden");
+            document.getElementById("badge-innovation").classList.add("hidden");
+
+            document.getElementById("label-slot-clarity").innerText = "Empty Slot";
+            document.getElementById("label-slot-clarity").className = "text-sm font-semibold text-slate-400 mt-1";
+            document.getElementById("label-slot-detail").innerText = "Empty Slot";
+            document.getElementById("label-slot-detail").className = "text-sm font-semibold text-slate-400 mt-1";
+            document.getElementById("label-slot-innovation").innerText = "Empty Slot";
+            document.getElementById("label-slot-innovation").className = "text-sm font-semibold text-slate-400 mt-1";
+
+            document.getElementById("coin-slot-clarity").className = "mb-2";
+            document.getElementById("coin-slot-clarity").innerHTML = `<i class="fa-solid fa-bullseye text-emerald-300 text-3xl"></i>`;
+            document.getElementById("coin-slot-detail").className = "mb-2";
+            document.getElementById("coin-slot-detail").innerHTML = `<i class="fa-solid fa-diagram-project text-blue-300 text-3xl"></i>`;
+            document.getElementById("coin-slot-innovation").className = "mb-2";
+            document.getElementById("coin-slot-innovation").innerHTML = `<i class="fa-regular fa-lightbulb text-amber-300 text-3xl"></i>`;
+
+            document.getElementById("voter-auth-box").classList.remove("hidden");
+            document.getElementById("ballot-paper").classList.add("hidden");
+
+            validateFormState();
+            renderCandidatesGrid();
+        }
+
+        // Update dashboard view analytics
+        function updateAppDashboard() {
+            const count = dbState.ballots.length;
+            document.getElementById("stat-ballots-count").innerText = count;
+            document.getElementById("stat-votes-count").innerText = count * 3;
+
+            // Recalculate metrics percentage distribution
+            const totalVotes = count * 3;
+            if (totalVotes > 0) {
+                const clarityPercent = Math.round((count / totalVotes) * 100);
+                const detailPercent = Math.round((count / totalVotes) * 100);
+                const innovationPercent = Math.round((count / totalVotes) * 100);
+
+                document.getElementById("metric-clarity-percent").innerText = `${clarityPercent}%`;
+                document.getElementById("metric-clarity-progress").style.width = `${clarityPercent}%`;
+                document.getElementById("metric-detail-percent").innerText = `${detailPercent}%`;
+                document.getElementById("metric-detail-progress").style.width = `${detailPercent}%`;
+                document.getElementById("metric-innovation-percent").innerText = `${innovationPercent}%`;
+                document.getElementById("metric-innovation-progress").style.width = `${innovationPercent}%`;
+            } else {
+                document.getElementById("metric-clarity-percent").innerText = "0%";
+                document.getElementById("metric-clarity-progress").style.width = "0%";
+                document.getElementById("metric-detail-percent").innerText = "0%";
+                document.getElementById("metric-detail-progress").style.width = "0%";
+                document.getElementById("metric-innovation-percent").innerText = "0%";
+                document.getElementById("metric-innovation-progress").style.width = "0%";
+            }
+
+            // Update audited recent list
+            const auditList = document.getElementById("recent-ballots-list");
+            auditList.innerHTML = "";
+
+            if (dbState.ballots.length === 0) {
+                auditList.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">No ballots logged in active sandbox session yet.</div>`;
+            } else {
+                // Display latest 10 ballots
+                const reverseList = [...dbState.ballots].reverse().slice(0, 10);
+                reverseList.forEach(b => {
+                    const row = document.createElement("div");
+                    row.className = "p-3 bg-white border border-[#e4dec9] rounded-xl text-xs flex items-center justify-between shadow-sm";
+                    
+                    // Simple initials
+                    const initials = b.voterName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 3);
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 font-bold flex items-center justify-center">${initials}</span>
+                            <div>
+                                <span class="font-bold text-slate-800">${b.voterName}</span>
+                                <span class="text-slate-400 block">ID: ${b.voterId}</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 font-semibold">${b.timestamp}</span>
+                    `;
+                    auditList.appendChild(row);
+                });
+            }
+        }
+
+        // Simulate classroom voting behavior
+        function simulateMultipleVotes(amount) {
+            const firstNames = ["James", "Emma", "Oliver", "Sophia", "Lucas", "Isabella", "Benjamin", "Mia", "Alexander", "Charlotte", "Amos", "Faisal", "Dmitri", "Yusuf", "Amina", "Nia", "Li", "John", "Kofi", "Zoe"];
+            const lastNames = ["Smith", "Jones", "Taylor", "Brown", "Wilson", "Gomez", "Kowalski", "Petrov", "Nguyen", "Sato", "Adeboye", "Al-Farsi", "Ivanov", "Onyekwere", "Miller", "Davis"];
+
+            for (let i = 0; i < amount; i++) {
+                const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const randomId = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                // Keep trying if this ID has already voted
+                if (dbState.ballots.some(b => b.voterId === randomId)) continue;
+
+                // Grab three distinct student candidates for Clarity, Detail, Innovation
+                const shuffled = [...candidates].sort(() => 0.5 - Math.random());
+                const clarityChoice = shuffled[0];
+                const detailChoice = shuffled[1];
+                const innovationChoice = shuffled[2];
+
+                dbState.ballots.push({
+                    voterName: `${randomFirst} ${randomLast}`,
+                    voterId: randomId,
+                    clarityVote: clarityChoice.rawId,
+                    detailVote: detailChoice.rawId,
+                    innovationVote: innovationChoice.rawId,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+            }
+
+            saveState();
+            showToast(`Simulated ${amount} classroom student ballots successfully!`, "success");
+        }
+
+        // Leaderboard stats modal handling
+        let currentSortField = "total"; // "total" or "name"
+        function openStatsModal() {
+            document.getElementById("stats-modal").classList.remove("hidden");
+            calculateLeaderboards();
+        }
+
+        function closeStatsModal() {
+            document.getElementById("stats-modal").classList.add("hidden");
+        }
+
+        function sortStandings(field) {
+            currentSortField = field;
+            calculateLeaderboards();
+        }
+
+        function calculateLeaderboards() {
+            // Count metrics
+            const clarityCounts = {};
+            const detailCounts = {};
+            const innovationCounts = {};
+            const totalCounts = {};
+
+            // Initialize keys
+            candidates.forEach(c => {
+                clarityCounts[c.rawId] = 0;
+                detailCounts[c.rawId] = 0;
+                innovationCounts[c.rawId] = 0;
+                totalCounts[c.rawId] = 0;
+            });
+
+            // Populate counts
+            dbState.ballots.forEach(b => {
+                if (clarityCounts[b.clarityVote] !== undefined) clarityCounts[b.clarityVote]++;
+                if (detailCounts[b.detailVote] !== undefined) detailCounts[b.detailVote]++;
+                if (innovationCounts[b.innovationVote] !== undefined) innovationCounts[b.innovationVote]++;
+                
+                if (totalCounts[b.clarityVote] !== undefined) totalCounts[b.clarityVote]++;
+                if (totalCounts[b.detailVote] !== undefined) totalCounts[b.detailVote]++;
+                if (totalCounts[b.innovationVote] !== undefined) totalCounts[b.innovationVote]++;
+            });
+
+            // Find category winners
+            let bestClarity = { name: "No Data", count: 0 };
+            let bestDetail = { name: "No Data", count: 0 };
+            let bestInnovation = { name: "No Data", count: 0 };
+
+            candidates.forEach(c => {
+                if (clarityCounts[c.rawId] > bestClarity.count) {
+                    bestClarity = { name: c.displayName, count: clarityCounts[c.rawId] };
+                }
+                if (detailCounts[c.rawId] > bestDetail.count) {
+                    bestDetail = { name: c.displayName, count: detailCounts[c.rawId] };
+                }
+                if (innovationCounts[c.rawId] > bestInnovation.count) {
+                    bestInnovation = { name: c.displayName, count: innovationCounts[c.rawId] };
+                }
+            });
+
+            // Update podium displays
+            document.getElementById("podium-clarity-name").innerText = bestClarity.name;
+            document.getElementById("podium-clarity-count").innerText = `${bestClarity.count} Category Votes`;
+            document.getElementById("podium-detail-name").innerText = bestDetail.name;
+            document.getElementById("podium-detail-count").innerText = `${bestDetail.count} Category Votes`;
+            document.getElementById("podium-innovation-name").innerText = bestInnovation.name;
+            document.getElementById("podium-innovation-count").innerText = `${bestInnovation.count} Category Votes`;
+
+            // Prepare list for standings table rendering
+            const standingsData = candidates.map(c => {
+                return {
+                    displayName: c.displayName,
+                    id: c.studentId,
+                    clarity: clarityCounts[c.rawId],
+                    detail: detailCounts[c.rawId],
+                    innovation: innovationCounts[c.rawId],
+                    total: totalCounts[c.rawId]
+                };
+            });
+
+            // Sort data
+            if (currentSortField === "total") {
+                standingsData.sort((a, b) => b.total - a.total || a.displayName.localeCompare(b.displayName));
+            } else if (currentSortField === "name") {
+                standingsData.sort((a, b) => a.displayName.localeCompare(b.displayName));
+            }
+
+            // Render table
+            const tbody = document.getElementById("standings-table-body");
+            tbody.innerHTML = "";
+
+            standingsData.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-800">${row.displayName}</div>
+                        <div class="text-[10px] text-slate-400">ID: ${row.id}</div>
+                    </td>
+                    <td class="py-3 px-4 text-center text-emerald-600 font-semibold">${row.clarity}</td>
+                    <td class="py-3 px-4 text-center text-blue-600 font-semibold">${row.detail}</td>
+                    <td class="py-3 px-4 text-center text-amber-600 font-semibold">${row.innovation}</td>
+                    <td class="py-3 px-4 text-right font-extrabold text-slate-900">${row.total}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Toast Messages Center (Handles warnings, status actions)
+        let toastTimeout;
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const icon = document.getElementById("toast-icon");
+            const msgEl = document.getElementById("toast-message");
+
+            clearTimeout(toastTimeout);
+
+            // Set colors based on type
+            if (type === "success") {
+                container.className = "flex items-center gap-3 p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800";
+                icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+            } else if (type === "warning") {
+                container.className = "flex items-center gap-3 p-4 rounded-xl border bg-amber-50 border-amber-200 text-amber-800";
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            } else if (type === "danger") {
+                container.className = "flex items-center gap-3 p-4 rounded-xl border bg-red-50 border-red-200 text-red-800";
+                icon.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+            }
+
+            msgEl.innerText = message;
+            container.classList.remove("hidden");
+
+            toastTimeout = setTimeout(() => {
+                container.classList.add("hidden");
+            }, 6000);
+        }
+
+        // Flush database data actions
+        function triggerReset() {
+            document.getElementById("confirm-modal").classList.remove("hidden");
+        }
+
+        function cancelReset() {
+            document.getElementById("confirm-modal").classList.add("hidden");
+        }
+
+        function executeReset() {
+            clearDatabase();
+            document.getElementById("confirm-modal").classList.add("hidden");
+        }
+
+        function clearDatabase() {
+            dbState.ballots = [];
+            dbState.voters = [];
+            saveState();
+            logoutVoter();
+            showToast("Sandbox storage cleared. Dashboard metrics set back to zero.", "success");
+        }
+    </script>
+</body>
+</html>
+
 
